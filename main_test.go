@@ -59,7 +59,7 @@ func TestCafeCount(t *testing.T) {
 		city  string
 		want  int // ожидаемое количество кафе в ответе
 	}{
-		{0, "moscow", 1}, // ожидаем возврат пустой строки
+		{0, "moscow", 0},
 		{1, "moscow", 1},
 		{2, "moscow", 2},
 		{100, "moscow", len(cafeList["moscow"])},
@@ -79,8 +79,12 @@ func TestCafeCount(t *testing.T) {
 			fmt.Sprintf("For count = %d and city = %s expected status 200, got %d",
 				v.count, v.city, response.Code))
 
-		cafe := strings.Split(strings.TrimSpace(response.Body.String()), ",")
-
+		cafeZero := strings.TrimSpace(response.Body.String())
+		if cafeZero == "" { // обходим возврат пустой строки
+			assert.Equal(t, v.want, 0)
+			continue
+		}
+		cafe := strings.Split(cafeZero, ",")
 		assert.Equal(t, v.want, len(cafe),
 			fmt.Sprintf("For count = %d and city = %s expected %d cafe, got %d",
 				v.count, v.city, v.want, len(cafe)))
